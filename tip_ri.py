@@ -78,12 +78,13 @@ def demosaicing(
     # and scale back to original range.
     img_bgr = np.stack([blue, green, red], axis=-1) * input_scale
 
-    # Clip to valid range and convert back to original dtype if it's an integer type.
+    # Clip to valid range if it's an integer type.
     if np.issubdtype(src.dtype, np.integer):
+        vmin = np.iinfo(src.dtype).min
         vmax = np.iinfo(src.dtype).max
-        img_bgr = np.clip(img_bgr, 0, vmax).astype(src.dtype)
+        img_bgr = np.clip(img_bgr, vmin, vmax)
 
-    return img_bgr
+    return img_bgr.astype(src.dtype)
 
 
 def _mosaic_and_mask_from_cfa(cfa: np.ndarray, pattern: str) -> tuple[np.ndarray, np.ndarray]:
