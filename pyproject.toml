@@ -1,0 +1,19 @@
+[project]
+name = "tip-ri-py"
+version = "0.1.0"
+description = "Unofficial Python implementation of the MLRI+wei demosaicing method."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.4.2",
+    "opencv-python>=4.13.0.92",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "colour-demosaicing>=0.2.7",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
