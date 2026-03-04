@@ -137,7 +137,7 @@ def _guidedfilter_mlri(
     N = cv2.boxFilter(M, ddepth=-1, ksize=ksize, normalize=False, borderType=BORDER)
     N = np.where(N == 0, 1.0, N)
     mean_Ip = cv2.boxFilter(I * p * M, -1, ksize, normalize=False, borderType=BORDER) / N
-    mean_II = cv2.boxFilter(I * I * M, -1, ksize, normalize=False, borderType=BORDER) / N
+    mean_II = cv2.boxFilter(I**2 * M, -1, ksize, normalize=False, borderType=BORDER) / N
     a = mean_Ip / (mean_II + eps)
 
     N3 = cv2.boxFilter(mask, -1, ksize, normalize=False, borderType=BORDER)
@@ -146,12 +146,12 @@ def _guidedfilter_mlri(
     mean_R = cv2.boxFilter(ref * mask, -1, ksize, normalize=False, borderType=BORDER) / N3
     b = mean_R - a * mean_G
 
-    gg = cv2.boxFilter(guide * guide * mask, -1, ksize, normalize=False, borderType=BORDER)
-    rr = cv2.boxFilter(ref * ref * mask, -1, ksize, normalize=False, borderType=BORDER)
+    gg = cv2.boxFilter(guide**2 * mask, -1, ksize, normalize=False, borderType=BORDER)
+    rr = cv2.boxFilter(ref**2 * mask, -1, ksize, normalize=False, borderType=BORDER)
     g = cv2.boxFilter(guide * mask, -1, ksize, normalize=False, borderType=BORDER)
     r = cv2.boxFilter(ref * mask, -1, ksize, normalize=False, borderType=BORDER)
     rg = cv2.boxFilter(ref * guide * mask, -1, ksize, normalize=False, borderType=BORDER)
-    dif = gg * a * a + b * b * N3 + rr + 2 * a * b * g - 2 * b * r - 2 * a * rg
+    dif = gg * a**2 + b**2 * N3 + rr + 2 * a * b * g - 2 * b * r - 2 * a * rg
     dif = dif / N3
     dif = np.maximum(dif, eps)
     dif = 1.0 / dif
@@ -173,6 +173,9 @@ def _green_interpolation(
     mask_gr, mask_gb = _build_green_split_masks((h, w), pattern)
 
     rawq = mosaic.sum(axis=2)
+    mosaic_r = mosaic[:, :, 2]
+    mosaic_g = mosaic[:, :, 1]
+    mosaic_b = mosaic[:, :, 0]
     mask_r = mask[:, :, 2]
     mask_g = mask[:, :, 1]
     mask_b = mask[:, :, 0]
@@ -182,12 +185,12 @@ def _green_interpolation(
     Kv = Kh.T
     rawh = cv2.filter2D(rawq, -1, Kh, borderType=BORDER)
     rawv = cv2.filter2D(rawq, -1, Kv, borderType=BORDER)
-    guide_gh = mosaic[:, :, 1] + rawh * (mask_r + mask_b)
-    guide_rh = mosaic[:, :, 2] + rawh * mask_gr
-    guide_bh = mosaic[:, :, 0] + rawh * mask_gb
-    guide_gv = mosaic[:, :, 1] + rawv * (mask_r + mask_b)
-    guide_rv = mosaic[:, :, 2] + rawv * mask_gb
-    guide_bv = mosaic[:, :, 0] + rawv * mask_gr
+    guide_gh = mosaic_g + rawh * (mask_r + mask_b)
+    guide_rh = mosaic_r + rawh * mask_gr
+    guide_bh = mosaic_b + rawh * mask_gb
+    guide_gv = mosaic_g + rawv * (mask_r + mask_b)
+    guide_rv = mosaic_r + rawv * mask_gb
+    guide_bv = mosaic_b + rawv * mask_gr
 
     # Tentative image
     h_rad = 3
@@ -196,50 +199,50 @@ def _green_interpolation(
     Fv = Fh.T
 
     # Horizontal
-    dif_r = cv2.filter2D(mosaic[:, :, 2], -1, Fh, borderType=BORDER)
+    dif_r = cv2.filter2D(mosaic_r, -1, Fh, borderType=BORDER)
     dif_gr = cv2.filter2D(guide_gh * mask_r, -1, Fh, borderType=BORDER)
-    tentative_rh = _guidedfilter_mlri(guide_gh, mosaic[:, :, 2], mask_r, dif_gr, dif_r, mask_r, h_rad, v_rad, eps)
+    tentative_rh = _guidedfilter_mlri(guide_gh, mosaic_r, mask_r, dif_gr, dif_r, mask_r, h_rad, v_rad, eps)
 
-    dif_gr = cv2.filter2D(mosaic[:, :, 1] * mask_gr, -1, Fh, borderType=BORDER)
+    dif_gr = cv2.filter2D(mosaic_g * mask_gr, -1, Fh, borderType=BORDER)
     dif_r = cv2.filter2D(guide_rh * mask_gr, -1, Fh, borderType=BORDER)
-    tentative_grh = _guidedfilter_mlri(guide_rh, mosaic[:, :, 1] * mask_gr, mask_gr, dif_r, dif_gr, mask_gr, h_rad, v_rad, eps)
+    tentative_grh = _guidedfilter_mlri(guide_rh, mosaic_g * mask_gr, mask_gr, dif_r, dif_gr, mask_gr, h_rad, v_rad, eps)
 
-    dif_b = cv2.filter2D(mosaic[:, :, 0], -1, Fh, borderType=BORDER)
+    dif_b = cv2.filter2D(mosaic_b, -1, Fh, borderType=BORDER)
     dif_gb = cv2.filter2D(guide_gh * mask_b, -1, Fh, borderType=BORDER)
-    tentative_bh = _guidedfilter_mlri(guide_gh, mosaic[:, :, 0], mask_b, dif_gb, dif_b, mask_b, h_rad, v_rad, eps)
+    tentative_bh = _guidedfilter_mlri(guide_gh, mosaic_b, mask_b, dif_gb, dif_b, mask_b, h_rad, v_rad, eps)
 
-    dif_gb = cv2.filter2D(mosaic[:, :, 1] * mask_gb, -1, Fh, borderType=BORDER)
+    dif_gb = cv2.filter2D(mosaic_g * mask_gb, -1, Fh, borderType=BORDER)
     dif_b = cv2.filter2D(guide_bh * mask_gb, -1, Fh, borderType=BORDER)
-    tentative_gbh = _guidedfilter_mlri(guide_bh, mosaic[:, :, 1] * mask_gb, mask_gb, dif_b, dif_gb, mask_gb, h_rad, v_rad, eps)
+    tentative_gbh = _guidedfilter_mlri(guide_bh, mosaic_g * mask_gb, mask_gb, dif_b, dif_gb, mask_gb, h_rad, v_rad, eps)
 
     # Vertical
-    dif_r = cv2.filter2D(mosaic[:, :, 2], -1, Fv, borderType=BORDER)
+    dif_r = cv2.filter2D(mosaic_r, -1, Fv, borderType=BORDER)
     dif_gr = cv2.filter2D(guide_gv * mask_r, -1, Fv, borderType=BORDER)
-    tentative_rv = _guidedfilter_mlri(guide_gv, mosaic[:, :, 2], mask_r, dif_gr, dif_r, mask_r, v_rad, h_rad, eps)
+    tentative_rv = _guidedfilter_mlri(guide_gv, mosaic_r, mask_r, dif_gr, dif_r, mask_r, v_rad, h_rad, eps)
 
-    dif_gr = cv2.filter2D(mosaic[:, :, 1] * mask_gb, -1, Fv, borderType=BORDER)
+    dif_gr = cv2.filter2D(mosaic_g * mask_gb, -1, Fv, borderType=BORDER)
     dif_r = cv2.filter2D(guide_rv * mask_gb, -1, Fv, borderType=BORDER)
-    tentative_grv = _guidedfilter_mlri(guide_rv, mosaic[:, :, 1] * mask_gb, mask_gb, dif_r, dif_gr, mask_gb, v_rad, h_rad, eps)
+    tentative_grv = _guidedfilter_mlri(guide_rv, mosaic_g * mask_gb, mask_gb, dif_r, dif_gr, mask_gb, v_rad, h_rad, eps)
 
-    dif_b = cv2.filter2D(mosaic[:, :, 0], -1, Fv, borderType=BORDER)
+    dif_b = cv2.filter2D(mosaic_b, -1, Fv, borderType=BORDER)
     dif_gb = cv2.filter2D(guide_gv * mask_b, -1, Fv, borderType=BORDER)
-    tentative_bv = _guidedfilter_mlri(guide_gv, mosaic[:, :, 0], mask_b, dif_gb, dif_b, mask_b, v_rad, h_rad, eps)
+    tentative_bv = _guidedfilter_mlri(guide_gv, mosaic_b, mask_b, dif_gb, dif_b, mask_b, v_rad, h_rad, eps)
 
-    dif_gb = cv2.filter2D(mosaic[:, :, 1] * mask_gr, -1, Fv, borderType=BORDER)
+    dif_gb = cv2.filter2D(mosaic_g * mask_gr, -1, Fv, borderType=BORDER)
     dif_b = cv2.filter2D(guide_bv * mask_gr, -1, Fv, borderType=BORDER)
-    tentative_gbv = _guidedfilter_mlri(guide_bv, mosaic[:, :, 1] * mask_gr, mask_gr, dif_b, dif_gb, mask_gr, v_rad, h_rad, eps)
+    tentative_gbv = _guidedfilter_mlri(guide_bv, mosaic_g * mask_gr, mask_gr, dif_b, dif_gb, mask_gr, v_rad, h_rad, eps)
 
     # Residual
     Kh_lin = np.array([[0.5, 0.0, 0.5]], dtype=FLOATING_DTYPE)
     Kv_lin = Kh_lin.T
-    residual_grh = cv2.filter2D((mosaic[:, :, 1] - tentative_grh) * mask_gr, -1, Kh_lin, borderType=BORDER)
-    residual_gbh = cv2.filter2D((mosaic[:, :, 1] - tentative_gbh) * mask_gb, -1, Kh_lin, borderType=BORDER)
-    residual_rh = cv2.filter2D((mosaic[:, :, 2] - tentative_rh) * mask_r, -1, Kh_lin, borderType=BORDER)
-    residual_bh = cv2.filter2D((mosaic[:, :, 0] - tentative_bh) * mask_b, -1, Kh_lin, borderType=BORDER)
-    residual_grv = cv2.filter2D((mosaic[:, :, 1] - tentative_grv) * mask_gb, -1, Kv_lin, borderType=BORDER)
-    residual_gbv = cv2.filter2D((mosaic[:, :, 1] - tentative_gbv) * mask_gr, -1, Kv_lin, borderType=BORDER)
-    residual_rv = cv2.filter2D((mosaic[:, :, 2] - tentative_rv) * mask_r, -1, Kv_lin, borderType=BORDER)
-    residual_bv = cv2.filter2D((mosaic[:, :, 0] - tentative_bv) * mask_b, -1, Kv_lin, borderType=BORDER)
+    residual_grh = cv2.filter2D((mosaic_g - tentative_grh) * mask_gr, -1, Kh_lin, borderType=BORDER)
+    residual_gbh = cv2.filter2D((mosaic_g - tentative_gbh) * mask_gb, -1, Kh_lin, borderType=BORDER)
+    residual_rh = cv2.filter2D((mosaic_r - tentative_rh) * mask_r, -1, Kh_lin, borderType=BORDER)
+    residual_bh = cv2.filter2D((mosaic_b - tentative_bh) * mask_b, -1, Kh_lin, borderType=BORDER)
+    residual_grv = cv2.filter2D((mosaic_g - tentative_grv) * mask_gb, -1, Kv_lin, borderType=BORDER)
+    residual_gbv = cv2.filter2D((mosaic_g - tentative_gbv) * mask_gr, -1, Kv_lin, borderType=BORDER)
+    residual_rv = cv2.filter2D((mosaic_r - tentative_rv) * mask_r, -1, Kv_lin, borderType=BORDER)
+    residual_bv = cv2.filter2D((mosaic_b - tentative_bv) * mask_b, -1, Kv_lin, borderType=BORDER)
 
     # Add tentative and residual
     grh = (tentative_grh + residual_grh) * mask_r
@@ -252,8 +255,9 @@ def _green_interpolation(
     bv = (tentative_bv + residual_bv) * mask_gr
 
     # Vertical-Horizontal color difference
-    difh = mosaic[:, :, 1] + grh + gbh - mosaic[:, :, 2] - mosaic[:, :, 0] - rh - bh
-    difv = mosaic[:, :, 1] + grv + gbv - mosaic[:, :, 2] - mosaic[:, :, 0] - rv - bv
+    mosaic_g_r_b = mosaic_g - mosaic_r - mosaic_b
+    difh = grh + gbh - rh - bh + mosaic_g_r_b
+    difv = grv + gbv - rv - bv + mosaic_g_r_b
 
     # Combine vertical and horizontal color differences
     # color difference gradient
@@ -295,8 +299,8 @@ def _green_interpolation(
     dife = cv2.filter2D(difh, -1, Ke_full, borderType=BORDER)
     Wt = Ww + We + Wn + Ws
     dif = (Wn * difn + Ws * difs + Ww * difw + We * dife) / Wt
-    green = dif + rawq
-    green = green * (1.0 - mask_g) + rawq * mask_g
+    # green = (dif + rawq) * (1.0 - mask_g) + rawq * mask_g
+    green = dif * (1.0 - mask_g) + rawq
     return green
 
 

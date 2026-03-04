@@ -14,7 +14,7 @@ The interface is designed to be similar to OpenCV’s cv2.demosaicing.
 
 ## Benchmark
 
-The evaluation was conducted on a 1500 × 1000 image with the RGGB Bayer pattern using the methods listed below. Experiments were performed on a MacBook Pro equipped with an M1 Max chip (10-core CPU, 32 GB RAM). PSNR was computed with respect to the original reference image, and runtime was averaged over 20 runs.
+The evaluation was conducted on a 1500 × 1000 image with the RGGB Bayer pattern using the methods listed below. Experiments were performed on a MacBook Pro equipped with an M1 Max chip (10-core CPU, 32 GB RAM). PSNR was computed with respect to the original reference image, and runtime was averaged over 50 runs.
 
 The benchmark compares the proposed MLRI+wei implementation against several widely used demosaicing baselines: Malvar (2004) and Menon (2007) from the colour-demosaicing library, as well as OpenCV’s built-in edge-aware and bilinear demosaicing methods.
 
@@ -22,11 +22,11 @@ The benchmark compares the proposed MLRI+wei implementation against several wide
 
 | Method      | Implementation     | PSNR (dB) | Time (s) [mean ± std] |
 | ----------- | ------------------ | --------- | --------------------- |
-| MLRI+wei    | This repository    | **38.17** | 0.8470±0.0486         |
-| Menon2007   | colour_demosaicing |   35.69   | 0.3687±0.0633         |
-| Malvar2004  | colour_demosaicing |   34.54   | 0.1081±0.0068         |
-| Edge-Aware  | OpenCV             |   30.77   | 0.0004±0.0004         |
-| Bilinear    | OpenCV             |   30.57   | 0.0005±0.0005         |
+| MLRI+wei    | This repository    | **38.17** | 0.7629±0.0270         |
+| Menon2007   | colour_demosaicing |   35.69   | 0.3383±0.0077         |
+| Malvar2004  | colour_demosaicing |   34.54   | 0.1058±0.0061         |
+| Edge-Aware  | OpenCV             |   30.77   | 0.0004±0.0002         |
+| Bilinear    | OpenCV             |   30.57   | 0.0005±0.0006         |
 
 ### Input and CFA
 
