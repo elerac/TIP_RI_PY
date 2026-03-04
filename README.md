@@ -1,6 +1,6 @@
 # MLRI+wei demosaicing in Python
 
-This repository provides an unofficial Python implementation of the **MLRI+wei demosaicing** method proposed by Kiku et al., "[Beyond Color Difference: Residual Interpolation for Color Image Demosaicking](http://www.ok.sc.e.titech.ac.jp/res/DM/TIP_RI.pdf)," in the 2016 IEEE TIP. The authors provide only a MATLAB implementation, so I re-implement it in Python using NumPy and OpenCV.
+This repository provides an unofficial Python implementation of the **MLRI+wei demosaicing** method proposed by Kiku et al., "[Beyond Color Difference: Residual Interpolation for Color Image Demosaicking](http://www.ok.sc.e.titech.ac.jp/res/DM/TIP_RI.pdf)," in the IEEE TIP 2016. The authors provide only a MATLAB implementation, so I re-implement it in Python using NumPy and OpenCV.
 
 ## Usage
 

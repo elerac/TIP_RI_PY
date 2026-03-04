@@ -5,11 +5,13 @@ This module provides `demosaicing`, an OpenCV-style API demosaicing based on:
 Daisuke Kiku, Yusuke Monno, Masayuki Tanaka and Masatoshi Okutomi,
 "Beyond Color Difference: Residual Interpolation for Color Image Demosaicking,"
 IEEE Transactions on Image Processing, 2016.
+- Paper, http://www.ok.sc.e.titech.ac.jp/res/DM/TIP_RI.pdf
+- Project page, http://www.ok.sc.e.titech.ac.jp/res/DM/RI.html
 
 The official MATLAB implementation was developed by Daisuke Kiku and Yusuke Monno:
-http://www.ok.sc.e.titech.ac.jp/res/DM/RI.html
+- Matlab code, http://www.ok.sc.e.titech.ac.jp/res/DM/TIP_RI.zip
 
-This code is an unofficial Python implementation developed by Ryota Maeda.
+This module is an unofficial Python implementation developed by Ryota Maeda.
 """
 
 import cv2
