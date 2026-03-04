@@ -1,9 +1,15 @@
-"""MLRI Bayer demosaicing implementation.
+"""MLRI+wei Bayer demosaicing implementation.
 
-This module provides `demosaicing`, an OpenCV-style API for Bayer-to-BGR
-demosaicing based on the Residual Interpolation / MLRI method from:
-"Beyond Color Difference: Residual Interpolation for Color Image
-Demosaicking" (IEEE Transactions on Image Processing, 2016).
+This module provides `demosaicing`, an OpenCV-style API demosaicing based on:
+
+Daisuke Kiku, Yusuke Monno, Masayuki Tanaka and Masatoshi Okutomi,
+"Beyond Color Difference: Residual Interpolation for Color Image Demosaicking,"
+IEEE Transactions on Image Processing, 2016.
+
+The official MATLAB implementation was developed by Daisuke Kiku and Yusuke Monno:
+http://www.ok.sc.e.titech.ac.jp/res/DM/RI.html
+
+This code is an unofficial Python implementation developed by Ryota Maeda.
 """
 
 import cv2
