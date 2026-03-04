@@ -14,7 +14,7 @@ You can copy the `tip_ri.py` file into your project and import the demosaicing f
 
 ## Benchmark
 
-The evaluation was conducted on a 1500 × 1000 image with the RGGB Bayer pattern using the methods listed below. Experiments were performed on a MacBook Pro equipped with an M1 Max chip (10-core CPU, 32 GB RAM). PSNR was computed with respect to the original reference image, and runtime was averaged over 50 runs.
+The evaluation was conducted on a 1500 × 1000 image with the RGGB Bayer pattern using the methods listed below. Experiments were performed on a MacBook Pro equipped with an M1 Max chip. PSNR was computed with respect to the original reference image, and runtime was averaged over 50 runs.
 
 The benchmark compares the proposed MLRI+wei implementation against several widely used demosaicing baselines: Malvar (2004) and Menon (2007) from the colour-demosaicing library, as well as OpenCV’s built-in edge-aware and bilinear demosaicing methods.
 
