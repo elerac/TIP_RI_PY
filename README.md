@@ -10,7 +10,7 @@ from tip_ri import demosaicing
 img_bgr = demosaicing(img_raw, cv2.COLOR_BAYER_RGGB2BGR)
 ```
 
-The interface is designed to be similar to OpenCV’s cv2.demosaicing.
+You can copy the `tip_ri.py` file into your project and import the demosaicing function. The interface is designed to be similar to OpenCV’s cv2.demosaicing.
 
 ## Benchmark
 
