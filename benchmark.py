@@ -103,7 +103,7 @@ def main() -> None:
     results: list[dict[str, float | str]] = []
 
     # Number of runs for timing measurement
-    num_runs = 20
+    num_runs = 50
 
     for method_name, fn in methods.items():
         print(f"Processing {method_name}...")
@@ -127,8 +127,6 @@ def main() -> None:
             crop_zoom = _crop_and_zoom(img_bgr_demosaiced, x0, y0, crop_w, crop_h, scale=4)
             filename_crop = RESULTS_DIR / f"{stem}_demosaiced_{method_name}_{crop_name}.png"
             cv2.imwrite(filename_crop, crop_zoom, [cv2.IMWRITE_PNG_COMPRESSION, 9])
-            if crop_name == "crop1":
-                cv2.imwrite(RESULTS_DIR / f"{stem}_demosaiced_{method_name}_crop.png", crop_zoom, [cv2.IMWRITE_PNG_COMPRESSION, 9])
 
         psnr = cv2.PSNR(img_bgr, img_bgr_demosaiced)
         results.append(
