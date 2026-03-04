@@ -27,7 +27,7 @@ _CODE_TO_PATTERN = {
 
 def demosaicing(
     src: np.ndarray,
-    code: int | str = cv2.COLOR_BAYER_RGGB2BGR,
+    code: int = cv2.COLOR_BAYER_RGGB2BGR,
     *,
     sigma: float = 1.0,
     eps: float = 1e-16,
@@ -64,14 +64,7 @@ def demosaicing(
     src_norm = src.astype(FLOATING_DTYPE) / input_scale
 
     # Create mosaic and mask from the CFA image.
-    if isinstance(code, int):
-        pattern = _CODE_TO_PATTERN[code]
-    elif isinstance(code, str):
-        pattern = code.upper()
-        if pattern not in _CODE_TO_PATTERN.values():
-            raise ValueError(f"Unsupported Bayer pattern {pattern!r}.")
-    else:
-        raise ValueError(f"Unsupported code type {type(code)}. Must be int or str.")
+    pattern = _CODE_TO_PATTERN[code]
     mosaic, mask = _mosaic_and_mask_from_cfa(src_norm, pattern)
 
     # Perform green channel interpolation first,
